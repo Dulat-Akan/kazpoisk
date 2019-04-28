@@ -4,15 +4,16 @@
   "description": "my first socket.io app",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "combined-stream": "^1.0.7",
     "express": "^4.16.0",
     "fs": "0.0.1-security",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
     "mysql": "^2.16.0",
     "mysql2": "^1.5.3",
-    "request": "^2.85.0",
+    "path": "^0.12.7",
+    "php-unserialize": "0.0.1",
+    "request": "^2.88.0",
     "socket.io": "^2.1.0",
-    "watson-developer-cloud": "^3.15.0"
+    "socket.io-file": "^2.0.31"
   }
 }

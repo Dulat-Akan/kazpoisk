@@ -32,7 +32,7 @@ module.exports = {
         //var d = moment().startOf('day').tz('Asia/Almaty').format(); //return normal format
         var d = moment().startOf('day').tz('Asia/Almaty').valueOf() / 1000; //return unix timestamp
 
-        return d;
+        return Math.round(d);
 
     },
 
@@ -50,7 +50,7 @@ module.exports = {
       //  var d = moment().endOf('day').tz('Asia/Almaty').format();
         var d = moment().endOf('day').tz('Asia/Almaty').valueOf() / 1000;
 
-        return d;
+        return Math.round(d);
 
     },
 

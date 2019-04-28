@@ -1,4 +1,5 @@
 var db = require('../config/db.js');
+var dbelectron = require('../config/dbelectron.js');
 
 
 module.exports = function(io){
@@ -11,7 +12,7 @@ module.exports = function(io){
 
                 var device = data.device;
                 var valyuta = data.valyuta;
-
+                //1790276898823.3882
                 //console.log(device);
                 socket.join(device);
 
@@ -23,6 +24,8 @@ module.exports = function(io){
                 var easy_price = 0;
                 var valyuta_price_kzt = 0;
 
+                var currency_ru = 0;
+
                 //status = sending - razmesheno
                 //no = moderator
 
@@ -32,6 +35,14 @@ module.exports = function(io){
                 var empty_pod_text = "";
                 var status_cash_text_status = "";
                 var temp_status_text = "";
+
+                dbelectron.query('SELECT * FROM `currency` ',
+                    function(err, results, fields) {
+
+                      currency_ru = results[0].ru_kzt_russia;
+
+                    }
+                );
 
 
                 db.query('SELECT * FROM `appparams` ',
@@ -50,7 +61,7 @@ module.exports = function(io){
                       easy_price = results[0].quick_tarif;
 
 
-                      io.sockets.in(device).emit('load_all_info_action', {empty_ob_price:empty_ob_price,gold_price:gold_price,premium_price:premium_price,classic_price:classic_price,quick_price:quick_price,easy_price:easy_price,empty_pod_text:empty_pod_text,automatic_publication_status:automatic_publication_status,temp_status_text:temp_status_text});
+                      io.sockets.in(device).emit('load_all_info_action', {empty_ob_price:empty_ob_price,gold_price:gold_price,premium_price:premium_price,classic_price:classic_price,quick_price:quick_price,easy_price:easy_price,empty_pod_text:empty_pod_text,automatic_publication_status:automatic_publication_status,temp_status_text:temp_status_text,currency_ru:currency_ru});
 
                     }
                 );

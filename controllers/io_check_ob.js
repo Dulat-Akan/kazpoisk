@@ -55,10 +55,16 @@ module.exports = function(io){
               var count_quick_status = 0;
               var count_easy_status = 0;
 
-
+              //starttime + ' AND date < ' + endtime
+              //console.log(starttime);
+              //console.log(endtime);
+              //1554955199.999
+              //1554900000
               //io.sockets.in(email).emit('check_ob_action', {msg: 'test',rows:rows});
-
-              db_multiple.query('SELECT * FROM `appparams`; SELECT * FROM `users` WHERE email =\'' + email + '\' LIMIT 1;SELECT * FROM `users` WHERE device_id =\'' + deviceid + '\' LIMIT 1;SELECT * FROM `obinfo` WHERE date >= ' + starttime + ' AND date <= ' + endtime + ' AND email = \'' + email + '\';SELECT * FROM `obinfo` WHERE email =\'' + email + '\';SELECT * FROM `obinfo` WHERE device_id =\'' + deviceid + '\';SELECT * FROM `obinfo` WHERE date >= ' + starttime + ' AND date <= ' + endtime + ' AND device_id =\'' + deviceid + '\';', function (error, results, fields) {
+              //date < ' + endtime + ' AND
+              //AND date < ' + endtime + '
+                                          //0                                     //1                                                       //2                                                                           //3                                                                                                                           //4                                                                   //5                                                                             //6
+              db_multiple.query('SELECT * FROM `appparams`; SELECT * FROM `users` WHERE email =\'' + email + '\' LIMIT 1;SELECT * FROM `users` WHERE device_id =\'' + deviceid + '\' LIMIT 1;SELECT * FROM `obinfo` WHERE date > ' + starttime + ' AND date IS NOT NULL AND email = \'' + email + '\' ORDER BY id DESC LIMIT 20;SELECT * FROM `obinfo` WHERE email =\'' + email + '\' ORDER BY id DESC LIMIT 20;SELECT * FROM `obinfo` WHERE device_id =\'' + deviceid + '\' ORDER BY id DESC LIMIT 20;SELECT * FROM `obinfo` WHERE date > ' + starttime + '  AND date IS NOT NULL AND device_id =\'' + deviceid + '\' ORDER BY id DESC LIMIT 20;', function (error, results, fields) {
                       if (error) throw error;
 
                       //appparams
@@ -134,10 +140,12 @@ module.exports = function(io){
                       //check limit datelimit obyav
                       if(results[3].length >= datelimit){
                         datecheck_limit = 1;
+                        //console.log("1");
                       }
 
                       if(results[6].length >= datelimit){
                         datecheck_limit = 1;
+                        //console.log("2");
                       }
                       //check limit obyav
 
