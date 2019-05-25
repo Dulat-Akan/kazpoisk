@@ -11,6 +11,8 @@ module.exports = function(io){
               socket.on('homeStart', function (data) {
 
                    socket.join(data.deviceid);
+
+                   var latestid = 0;
                                                                 //gold                                                                  //premium                                                                                                                                               //random
                    db_multiple.query("SELECT * FROM `obinfo` WHERE `priority` = '5' AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `priority` = '4'  AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `status` != 'no' AND `status` != 'deleted' ORDER BY priority DESC, `id` DESC LIMIT 40;", function (error, results, fields) {
                      if (error) throw error;
@@ -27,14 +29,16 @@ module.exports = function(io){
                                 results[i][v].video = PHPUnserialize.unserialize(results[i][v].video);
                          }
 
+                         if(i == 2){
+                           latestid = results[i][v].id;
+                         }
+
                        }
-
-
 
                      }
                    // connected!
                    //console.log(results);
-                   io.sockets.in(data.deviceid).emit('homeStart', {gold: results[0],premium:results[1],latest:results[2]});
+                   io.sockets.in(data.deviceid).emit('homeStart', {gold: results[0],premium:results[1],latest:results[2],latestid:latestid});
 
                    });
 
@@ -48,3 +52,5 @@ module.exports = function(io){
 
 
 };
+
+//complete update count

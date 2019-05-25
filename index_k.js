@@ -16,6 +16,8 @@ require('./controllers/io_check_ob.js')(io);
 require('./controllers/load_all_info.js')(io);
 require('./controllers/upload_photo_video.js')(io);
 require('./controllers/load_homeStart.js')(io);
+require('./controllers/searchData.js')(io);
+require('./controllers/getCountData.js')(io);
 
 
 
@@ -117,21 +119,21 @@ function setMessage_email(){
 }
 
 
-setInterval(function(){
-
-
-	var date = new Date();
-
-	var hour = date.getHours();
-
-	var minutes = date.getMinutes();
-
-	var seconds = date.getSeconds();
-
-	if((time_message_obj["time"] == hour) && (time_message_obj['minutes'] == minutes) &&
-	 (time_message_obj['seconds'] == seconds)){
-		setMessage_email();
-	}
+// setInterval(function(){
+//
+//
+// 	var date = new Date();
+//
+// 	var hour = date.getHours();
+//
+// 	var minutes = date.getMinutes();
+//
+// 	var seconds = date.getSeconds();
+//
+// 	if((time_message_obj["time"] == hour) && (time_message_obj['minutes'] == minutes) &&
+// 	 (time_message_obj['seconds'] == seconds)){
+// 		setMessage_email();
+// 	}
 
 	// if((time_message_obj2["time"] == hour) && (time_message_obj2['minutes'] == minutes) &&
 	//  (time_message_obj2['seconds'] == seconds)){
@@ -141,7 +143,7 @@ setInterval(function(){
 	//console.log(hour + " : " + minutes + " : " + seconds);
 
 
-},1000);
+// },1000);
 
 
 //Чтобы отправить событие всем, Socket.IO дает нам io.emit:

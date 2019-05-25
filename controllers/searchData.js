@@ -1,6 +1,7 @@
 var db = require('../config/db.js');
 var db_multiple = require('../config/multiple_mysql.js');
 var formHelper = require("../models/formHelper.js");
+var PHPUnserialize = require('php-unserialize');
 
 module.exports = function(io){
 
@@ -8,9 +9,11 @@ module.exports = function(io){
         io.on('connection', function(socket){
 
 
-              socket.on('searchData', function (data) {
+              socket.on('searchData', function (success_data) {
 
-                   socket.join(data.email);
+                   var data = success_data.formdata;
+
+                   socket.join(success_data.email);
 
 
                    var search = data.search;
@@ -26,13 +29,34 @@ module.exports = function(io){
                    var srochno = false;
                    var video = false;
 
+                      if(data.aux){
+                        aux = formHelper.checkCheckbox(data.aux);
+                      }
 
-                 			aux = formHelper.checkCheckbox(data.aux);
-                      bezposr = formHelper.checkCheckbox(data.bezposr);
-                      novostr = formHelper.checkCheckbox(data.novostr);
-                      photo = formHelper.checkCheckbox(data.photo);
-                      srochno = formHelper.checkCheckbox(data.srochno);
-                      video = formHelper.checkCheckbox(data.video);
+                      if(data.photo){
+                        photo = formHelper.checkCheckbox(data.photo);
+                      }
+
+                      if(data.video){
+                        video = formHelper.checkCheckbox(data.video);
+                      }
+
+
+                      if(data.srochno){
+                        srochno = formHelper.checkCheckbox(data.srochno);
+                      }
+
+
+                      if(data.bezposr){
+                        bezposr = formHelper.checkCheckbox(data.bezposr);
+                      }
+
+
+                      if(data.novostr){
+                        novostr = formHelper.checkCheckbox(data.novostr);
+                      }
+
+
 
                       var photodb = "";
 
@@ -63,9 +87,10 @@ module.exports = function(io){
                           citydb = "AND `city` LIKE '" + city + "' AND `strana` LIKE '" + country + "'";
                       }
 
+
                       var finishsql = "ORDER BY priority DESC, `id` DESC LIMIT 40";
 
-                  var $searchusersemail = formHelper.inputFilter(data.useremailsearch);
+                  var searchusersemail = formHelper.inputFilter(data.useremailsearch);
 
 
                   var deletedob = "AND `status` != 'no' AND `status` != 'deleted'";
@@ -143,6 +168,7 @@ module.exports = function(io){
 
                    				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + kv + "%' " + category3db + " " + komnatdb + " " + senadb + " " + etazhdb + " " + ploshaddb + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + deletedob + " " + finishsql;
 
+
                    				break;
 
                    				case 'avto':
@@ -166,7 +192,7 @@ module.exports = function(io){
 
                    						var markadb = "";
 
-                   						if(data.markasearch != ""){
+                   						if((data.marka != "") && (data.model != "") && (data.model)){//model
 
                    								var marka = formHelper.inputFilter(data.marka);
                    								var model = formHelper.inputFilter(data.model);
@@ -187,13 +213,14 @@ module.exports = function(io){
                    							}
                    						}
 
+                              var yeardb = "";
+
                    						if((data.yearot != "") && (data.yeardo != "")){
 
                    							var yearot = formHelper.inputFilter(data.yearot);
                    							var yeardo = formHelper.inputFilter(data.yeardo);
 
-                   							var yeardb = "";
-                   							if((yearot >= "0") && (yeardo > "0") && (yeardo < "2100") && (yearot <= $yeardo)){
+                   							if((yearot >= "0") && (yeardo > "0") && (yeardo < "2100") && (yearot <= yeardo)){
 
                    								yeardb = "AND `year_build_car` >= '" + yearot + "' AND `year_build_car` <= '" + yeardo + "'";
 
@@ -270,7 +297,7 @@ module.exports = function(io){
                    								markadb = "AND `marka_spes45x` LIKE '%" + marka + "%'";
                    						}
 
-                   						$senadb = "";
+                   						var senadb = "";
                    						if((data.senaotav != "") && (data.senadoav != "")){
 
                    							var senaotav = formHelper.inputFilter(data.senaotav);
@@ -283,12 +310,14 @@ module.exports = function(io){
                    							}
                    						}
 
+                              var yeardb = "";
+
                    						if((data.yearot != "") && (data.yeardo != "")){
 
                    							var yearot = formHelper.inputFilter(data.yearot);
                    							var yeardo = formHelper.inputFilter(data.yeardo);
 
-                   							var yeardb = "";
+
                    							if((yearot >= "0") && (yeardo > "0") && (yeardo < "2100") && (yearot <= yeardo)){
 
                    								yeardb = "AND `year_build45x` >= '" + yearot + "' AND `year_build45x` <= '" + yeardo + "'";
@@ -344,100 +373,72 @@ module.exports = function(io){
 
                    				case 'zapchlegk':
 
-                   						if($city != "0" && $country != "0"){
-                   								$citydb = "AND `city` LIKE '".$city."' AND `strana` LIKE '".$country."'";
+                            var citydb = "";
+                   						if(city != "0" && country != "0"){
+                   								citydb = "AND `city` LIKE '" + city + "' AND `strana` LIKE '" + country + "'";
                    						}else{
-                   								$citydb = "";
+                   								citydb = "";
                    						}
 
-                   						$cat2 = "";
+                   						var cat2 = "";
 
-                   						if(isset($_GET['category2'])){
-                   							$category2 = $this->cleanfiltrationapp($_GET['category2']);
-                   							if($category2 == "запчасти"){
-                   								$cat2 = "запчасти";
+                   						if(data.category2 != ""){
+                   							var category2 = data.category2;
+                   							if(category2 == "запчасти"){
+                   								cat2 = "запчасти";
                    							}
 
                    						}
 
-                   						$photodb = "";
+                   						var markadb = "";
 
-                   						if(isset($photo[0])){
-                   							if($photo[0] == "фото"){
-                   								$photodb = "AND `photo_path` != 'n.jpg'";
+                   						if(data.markasearch != ""){
+                   							if(data.markasearch != ""){
+                   								var marka = data.marka;
+                   								var model = data.model;
+                   								markadb = "AND `marka_legk67x` LIKE '%" + marka + "%' AND `model67x` LIKE '%" + model + "%'";
                    							}
                    						}
 
-                   						$videodb = "";
+                   						var senadb = "";
+                   						if((data.senaotav != "") && (data.senadoav)){
 
-                   						if(isset($video[0])){
-                   							if($video[0] == "video"){
-                   								$videodb = "AND `video` != 'нет'";
-                   							}
-                   						}
+                   							var senaotav = data.senaotav;
+                   							var senadoav = data.senadoav;
 
-                   						$auxdb = "";
+                   							if((senaotav >= "0") && (senadoav >= senaotav) && (senadoav > "0")){
 
-                   						if(isset($aux[0])){
-                   							if($aux[0] == "aux"){
-                   								$auxdb = "AND `vremya_nachala_auxion` != '0'";
-                   							}
-                   						}
-
-
-
-                   						$markadb = "";
-
-                   						if(isset($_GET['markasearch'])){
-                   							if($_GET['markasearch'] != ""){
-                   								$marka = $this->cleanfiltrationapp($_GET['marka']);
-                   								$model = $this->cleanfiltrationapp($_GET['model']);
-                   								$markadb = "AND `marka_legk67x` LIKE '%".$marka."%' AND `model67x` LIKE '%".$model."%'";
-                   							}
-                   						}
-
-                   						$senadb = "";
-                   						if(isset($_GET['senaotav']) && isset($_GET['senadoav'])){
-
-                   							$senaotav = $this->cleanfiltrationapp($_GET['senaotav']);
-                   							$senadoav = $this->cleanfiltrationapp($_GET['senadoav']);
-                   							//$valyuta = $_GET['valyuta'];
-
-                   							if($senaotav >= "0" && $senadoav >= $senaotav && $senadoav > "0"){
-
-                   								$senadb = "AND `sena` >= '".$senaotav."' AND `sena` <= '".$senadoav."'";
+                   								senadb = "AND `sena` >= '" + senaotav + "' AND `sena` <= '" + senadoav + "'";
 
                    							}
                    						}
 
 
-                   						$sostoyaniedb = "";
+                   						var sostoyaniedb = "";
 
-                   						if(isset($_GET['sostoyanie'])){
-                   							$sostoyanie = $this->cleanfiltrationapp($_GET['sostoyanie']);
+                   						if(data.sostoyanie != ""){
+                   							 var sostoyanie = data.sostoyanie;
 
-                   							if($sostoyanie != "all"){
-                   								$sostoyaniedb = "AND `sost_zapch_legk77` LIKE '%".$sostoyanie."%'";
+                   							if(sostoyanie != "all"){
+                   								 sostoyaniedb = "AND `sost_zapch_legk77` LIKE '%" + sostoyanie + "%'";
                    							}
 
                    						}
 
-                   						$whereisdb = "";
+                   						var whereisdb = "";
 
-                   						if(isset($_GET['whereis'])){
+                   						if(data.whereis != ""){
 
-                   							$whereis = $_GET['whereis'];
-                   							if($whereis != "all"){
-                   								$whereisdb = "AND `category3` LIKE '".$whereis."'";
+                   							var whereis = data.whereis;
+                   							if(whereis != "all"){
+                   								whereisdb = "AND `category3` LIKE '" + whereis + "'";
                    							}
 
                    						}
 
 
 
-                   				$sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%$cat2%' $citydb $photodb $videodb $auxdb $sostoyaniedb $markadb $senadb $whereisdb AND `marka_zapch_spes68x` = 'нет' $deletedob ORDER BY priority DESC, `id` DESC LIMIT 40";
-
-
+                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + " AND `marka_zapch_spes68x` = 'нет' " + deletedob + " " + finishsql;
 
 
 
@@ -445,103 +446,68 @@ module.exports = function(io){
 
                    				//zapchlegk
 
-
-
-
                    				case 'zapchspest':
 
-                   						if($city != "0" && $country != "0"){
-                   								$citydb = "AND `city` LIKE '".$city."' AND `strana` LIKE '".$country."'";
-                   						}else{
-                   								$citydb = "";
-                   						}
+                   						var cat2 = "";
 
-                   						$cat2 = "";
-
-                   						if(isset($_GET['category2'])){
-                   							$category2 = $this->cleanfiltrationapp($_GET['category2']);
-                   							if($category2 == "запчасти"){
-                   								$cat2 = "запчасти";
+                   						if(data.category2 != ""){
+                   						  var category2 = data.category2;
+                   							if(category2 == "запчасти"){
+                   								 cat2 = "запчасти";
                    							}
 
                    						}
 
-                   						$photodb = "";
 
-                   						if(isset($photo[0])){
-                   							if($photo[0] == "фото"){
-                   								$photodb = "AND `photo_path` != 'n.jpg'";
-                   							}
-                   						}
+                   						var markadb = "";
 
-                   						$videodb = "";
+                 							if(data.marka != ""){
+                 								var marka = data.marka;
 
-                   						if(isset($video[0])){
-                   							if($video[0] == "video"){
-                   								$videodb = "AND `video` != 'нет'";
-                   							}
-                   						}
+                 								markadb = "AND `marka_zapch_spes68x` LIKE '%" + marka + "%'";
 
-                   						$auxdb = "";
-
-                   						if(isset($aux[0])){
-                   							if($aux[0] == "aux"){
-                   								$auxdb = "AND `vremya_nachala_auxion` != '0'";
-                   							}
-                   						}
+                 							}
 
 
+                   						var senadb = "";
+                   						if((data.senaotav != "") && (data.senadoav != "")){
 
-                   						$markadb = "";
+                   							var senaotav = data.senaotav;
+                   							var senadoav = data.senadoav;
 
-                   						if(isset($_GET['marka'])){
-                   							if($_GET['marka'] != ""){
-                   								$marka = $this->cleanfiltrationapp($_GET['marka']);
+                   							if((senaotav >= "0") && (senadoav >= senaotav) && (senadoav > "0")){
 
-                   								$markadb = "AND `marka_zapch_spes68x` LIKE '%".$marka."%'";
-                   							}
-                   						}
-
-                   						$senadb = "";
-                   						if(isset($_GET['senaotav']) && isset($_GET['senadoav'])){
-
-                   							$senaotav = $this->cleanfiltrationapp($_GET['senaotav']);
-                   							$senadoav = $this->cleanfiltrationapp($_GET['senadoav']);
-                   							//$valyuta = $_GET['valyuta'];
-
-                   							if($senaotav >= "0" && $senadoav >= $senaotav && $senadoav > "0"){
-
-                   								$senadb = "AND `sena` >= '".$senaotav."' AND `sena` <= '".$senadoav."'";
+                   								senadb = "AND `sena` >= '" + senaotav + "' AND `sena` <= '" + senadoav + "'";
 
                    							}
                    						}
 
 
-                   						$sostoyaniedb = "";
+                   						var sostoyaniedb = "";
 
-                   						if(isset($_GET['sostoyanie'])){
-                   							$sostoyanie = $this->cleanfiltrationapp($_GET['sostoyanie']);
+                   						if(data.sostoyanie){
 
-                   							if($sostoyanie != "all"){
-                   								$sostoyaniedb = "AND `sost_zapch_spes75` LIKE '%".$sostoyanie."%'";
+                   							var sostoyanie = data.sostoyanie;
+                   							if(sostoyanie != "all"){
+                   								sostoyaniedb = "AND `sost_zapch_spes75` LIKE '%" + sostoyanie + "%'";
                    							}
 
                    						}
 
-                   						$whereisdb = "";
+                   						var whereisdb = "";
 
-                   						if(isset($_GET['whereis'])){
+                   						if(data.whereis != ""){
 
-                   							$whereis = $_GET['whereis'];
-                   							if($whereis != "all"){
-                   								$whereisdb = "AND `category3` LIKE '".$whereis."'";
+                   							var whereis = data.whereis;
+                   							if(whereis != "all"){
+                   								whereisdb = "AND `category3` LIKE '" + whereis + "'";
                    							}
 
                    						}
 
 
 
-                   				$sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%$cat2%' $citydb $photodb $videodb $auxdb $sostoyaniedb $markadb $senadb $whereisdb AND `marka_legk67x` = 'нет' $deletedob ORDER BY priority DESC, `id` DESC LIMIT 40";
+                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + "AND `marka_legk67x` = 'нет' " + deletedob + " " + finishsql;
 
 
 
@@ -554,465 +520,378 @@ module.exports = function(io){
 
                    				case 'shini':
 
-                   						if($city != "0" && $country != "0"){
-                   								$citydb = "AND `city` LIKE '".$city."' AND `strana` LIKE '".$country."'";
-                   						}else{
-                   								$citydb = "";
-                   						}
 
-                   						$cat2 = "";
+                   						var cat2 = "";
 
-                   						if(isset($_GET['category2'])){
-                   							$category2 = $this->cleanfiltrationapp($_GET['category2']);
-                   							if($category2 == "запчасти"){
-                   								$cat2 = "запчасти";
+                   						if(data.category2 != ""){
+                   							var category2 = data.category2;
+                   							if(category2 == "запчасти"){
+                   								cat2 = "запчасти";
                    							}
 
                    						}
 
-                   						$photodb = "";
 
-                   						if(isset($photo[0])){
-                   							if($photo[0] == "фото"){
-                   								$photodb = "AND `photo_path` != 'n.jpg'";
-                   							}
+                   						var markadb = "";
+
+                   						if(data.marka != ""){
+
+                   								var marka = data.marka;
+
+                   								markadb = "AND `marka_shini55x` LIKE '%" + marka + "%'";
+
                    						}
 
-                   						$videodb = "";
+                              var senadb = "";
+                              if((data.senaotav != "") && (data.senadoav != "")){
 
-                   						if(isset($video[0])){
-                   							if($video[0] == "video"){
-                   								$videodb = "AND `video` != 'нет'";
-                   							}
-                   						}
-
-                   						$auxdb = "";
-
-                   						if(isset($aux[0])){
-                   							if($aux[0] == "aux"){
-                   								$auxdb = "AND `vremya_nachala_auxion` != '0'";
-                   							}
-                   						}
+                                var senaotav = formHelper.inputFilter(data.senaotav);
+                                var senadoav = formHelper.inputFilter(data.senadoav);
 
 
+                                if(senaotav >= "0" && senadoav >= senaotav && senadoav > "0"){
 
-                   						$markadb = "";
+                                  senadb = "AND `sena` >= '" + senaotav + "' AND `sena` <= '" + senadoav + "'";
 
-                   						if(isset($_GET['marka'])){
-                   							if($_GET['marka'] != ""){
-                   								$marka = $this->cleanfiltrationapp($_GET['marka']);
-
-                   								$markadb = "AND `marka_shini55x` LIKE '%".$marka."%'";
-                   							}
-                   						}
-
-                   						$senadb = "";
-                   						if(isset($_GET['senaotav']) && isset($_GET['senadoav'])){
-
-                   							$senaotav = $this->cleanfiltrationapp($_GET['senaotav']);
-                   							$senadoav = $this->cleanfiltrationapp($_GET['senadoav']);
-                   							//$valyuta = $_GET['valyuta'];
-
-                   							if($senaotav >= "0" && $senadoav >= $senaotav && $senadoav > "0"){
-
-                   								$senadb = "AND `sena` >= '".$senaotav."' AND `sena` <= '".$senadoav."'";
-
-                   							}
-                   						}
+                                }
+                              }
 
 
-                   						$protectordb = "";
+                   						var protectordb = "";
 
-                   						if(isset($_GET['protector'])){
-                   							$protector = $this->cleanfiltrationapp($_GET['protector']);
+                   						if(data.protector != ""){
+                   							var protector = data.protector;
 
-                   							if($protector != "нет"){
-                   								$protectordb = "AND `protector55x` LIKE '%".$protector."%'";
+                   							if(protector != "нет"){
+             								       protectordb = "AND `protector55x` LIKE '%" + protector + "%'";
                    							}
 
                    						}
 
-                   						$yearbuilddb = "";
+                   						var yearbuilddb = "";
 
-                   						if(isset($_GET['yearshina'])){
-                   							$yearshina = $this->cleanfiltrationapp($_GET['yearshina']);
+                   						if(data.yearshina != ""){
+                   							var yearshina = data.yearshina;
 
-                   							if($yearshina != 0){
-                   								$yearbuilddb = "AND `year_build_shina55x` LIKE '%".$yearshina."%'";
+                   							if(yearshina != 0){
+                   								yearbuilddb = "AND `year_build_shina55x` LIKE '%" + yearshina + "%'";
                    							}
                    						}
 
-                   						$diamshinadb = "";
+                   						var diamshinadb = "";
 
-                   						if(isset($_GET['diamshina'])){
-                   							$diamshina = $this->cleanfiltrationapp($_GET['diamshina']);
-                   							if($diamshina != "0"){
-                   								$diamshinadb = "AND `diam_shina55x` LIKE '%".$diamshina."%'";
-                   							}
-                   						}
-
-
-                   						$iznosshinadb = "";
-
-                   						if(isset($_GET['iznosshina'])){
-                   							$iznosshina = $this->cleanfiltrationapp($_GET['iznosshina']);
-                   							if($iznosshina != 0){
-                   								$iznosshinadb = "AND `iznos_shina55x` LIKE '%".$iznosshina."%'";
-                   							}
-                   						}
-
-                   						$countshinadb = "";
-
-                   						if(isset($_GET['countshina'])){
-                   							$countshina = $this->cleanfiltrationapp($_GET['countshina']);
-                   							if($countshina != 0){
-                   								$countshinadb = "AND `kol_shtuk55x` LIKE '%".$countshina."%'";
-                   							}
-                   						}
-
-                   						$classificationdb = "";
-
-                   						if(isset($_GET['classification'])){
-                   							$classification = $this->cleanfiltrationapp($_GET['classification']);
-                   							if($classification != 0){
-                   								$classificationdb = "AND `type_shina56x` LIKE '%".$classification."%'";
+                   						if(data.diamshina != ""){
+                   							var diamshina = formHelper.inputFilter(data.diamshina);
+                   							if(diamshina != "0"){
+                   								 diamshinadb = "AND `diam_shina55x` LIKE '%" + diamshina + "%'";
                    							}
                    						}
 
 
+                   						var iznosshinadb = "";
+
+                   						if(data.iznosshina != ""){
+                   							var iznosshina = formHelper.inputFilter(data.iznosshina);
+                   							if(iznosshina != 0){
+                   								iznosshinadb = "AND `iznos_shina55x` LIKE '%" + iznosshina + "%'";
+                   							}
+                   						}
+
+                   						var countshinadb = "";
+
+                   						if(data.countshina != ""){
+                   							var countshina = formHelper.inputFilter(data.countshina);
+                   							if(countshina != 0){
+                   								countshinadb = "AND `kol_shtuk55x` LIKE '%" + countshina + "%'";
+                   							}
+                   						}
+
+                   						var classificationdb = "";
+
+                   						if(data.classification != ""){
+                   							var classification = formHelper.inputFilter(data.classification);
+                   							if(classification != 0){
+                   								classificationdb = "AND `type_shina56x` LIKE '%" + classification + "%'";
+                   							}
+                   						}
 
 
-
-                   				$sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%$cat2%' AND `category3` LIKE '%Шины%' $citydb $photodb $videodb $auxdb $protectordb $markadb $senadb $yearbuilddb $diamshinadb $iznosshinadb $countshinadb $classificationdb $deletedob ORDER BY priority DESC, `id` DESC LIMIT 40";
-
-
-
+                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Шины%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
 
 
                    				break;
 
                    				//shini
 
-
-
                    				case 'diski':
 
-                   						if($city != "0" && $country != "0"){
-                   								$citydb = "AND `city` LIKE '".$city."' AND `strana` LIKE '".$country."'";
-                   						}else{
-                   								$citydb = "";
-                   						}
 
-                   						$cat2 = "";
+                   						var cat2 = "";
 
-                   						if(isset($_GET['category2'])){
-                   							$category2 = $this->cleanfiltrationapp($_GET['category2']);
-                   							if($category2 == "запчасти"){
-                   								$cat2 = "запчасти";
+                   						if(data.category2 != ""){
+                   							var category2 = data.category2;
+                   							if(category2 == "запчасти"){
+                   								cat2 = "запчасти";
                    							}
 
                    						}
 
-                   						$photodb = "";
 
-                   						if(isset($photo[0])){
-                   							if($photo[0] == "фото"){
-                   								$photodb = "AND `photo_path` != 'n.jpg'";
-                   							}
+                   						var markadb = "";
+
+                   						if(data.marka != ""){
+
+                   								var marka = data.marka;
+
+                   								markadb = "AND `marka_shini55x` LIKE '%" + marka + "%'";
+
                    						}
 
-                   						$videodb = "";
+                   						var senadb = "";
+                   						if((data.senaotav != "") && (data.senadoav != "")){
 
-                   						if(isset($video[0])){
-                   							if($video[0] == "video"){
-                   								$videodb = "AND `video` != 'нет'";
-                   							}
-                   						}
-
-                   						$auxdb = "";
-
-                   						if(isset($aux[0])){
-                   							if($aux[0] == "aux"){
-                   								$auxdb = "AND `vremya_nachala_auxion` != '0'";
-                   							}
-                   						}
+                   							var senaotav = formHelper.inputFilter(data.senaotav);
+                   							var senadoav = formHelper.inputFilter(data.senadoav);
 
 
+                   							if((senaotav >= "0") && (senadoav >= senaotav) && (senadoav > "0")){
 
-                   						$markadb = "";
-
-                   						if(isset($_GET['marka'])){
-                   							if($_GET['marka'] != ""){
-                   								$marka = $this->cleanfiltrationapp($_GET['marka']);
-
-                   								$markadb = "AND `marka_shini55x` LIKE '%".$marka."%'";
-                   							}
-                   						}
-
-                   						$senadb = "";
-                   						if(isset($_GET['senaotav']) && isset($_GET['senadoav'])){
-
-                   							$senaotav = $this->cleanfiltrationapp($_GET['senaotav']);
-                   							$senadoav = $this->cleanfiltrationapp($_GET['senadoav']);
-                   							//$valyuta = $_GET['valyuta'];
-
-                   							if($senaotav >= "0" && $senadoav >= $senaotav && $senadoav > "0"){
-
-                   								$senadb = "AND `sena` >= '".$senaotav."' AND `sena` <= '".$senadoav."'";
+                   								senadb = "AND `sena` >= '" + senaotav + "' AND `sena` <= '" + senadoav + "'";
 
                    							}
                    						}
 
 
-                   						$protectordb = "";
+                   						var protectordb = "";
 
-                   						if(isset($_GET['typed'])){
-                   							$protector = $_GET['typed'];
+                   						if(data.typed != ""){
+                   							var protector = formHelper.inputFilter(data.typed);
 
-                   							if($protector != "нет"){
-                   								$protectordb = "AND `type_diska217x56x` LIKE '%".$protector."%'";
+                   							if(protector != "нет"){
+                   								protectordb = "AND `type_diska217x56x` LIKE '%" + protector + "%'";
                    							}
 
                    						}
 
-                   						$yearbuilddb = "";
+                   						var yearbuilddb = "";
 
-                   						if(isset($_GET['yearshina'])){
-                   							$yearshina = $_GET['yearshina'];
+                   						if(data.yearshina != ""){
+                   							var yearshina = data.yearshina;
 
-                   							if($yearshina != 0){
-                   								$yearbuilddb = "AND `year_disk17x56x` LIKE '%".$yearshina."%'";
+                   							if(yearshina != 0){
+                   								yearbuilddb = "AND `year_disk17x56x` LIKE '%" + yearshina + "%'";
                    							}
                    						}
 
-                   						$diamshinadb = "";
+                   						var diamshinadb = "";
 
-                   						if(isset($_GET['diamshina'])){
-                   							$diamshina = $_GET['diamshina'];
-                   							if($diamshina != "0"){
-                   								$diamshinadb = "AND `diam_diska17x56x` LIKE '%".$diamshina."%'";
-                   							}
-                   						}
-
-
-                   						$iznosshinadb = "";
-
-                   						if(isset($_GET['iznosshina'])){
-                   							$iznosshina = $_GET['iznosshina'];
-                   							if($iznosshina != 0){
-                   								$iznosshinadb = "AND `iznos_diska17x56x` LIKE '%".$iznosshina."%'";
-                   							}
-                   						}
-
-                   						$countshinadb = "";
-
-                   						if(isset($_GET['countshina'])){
-                   							$countshina = $_GET['countshina'];
-                   							if($countshina != 0){
-                   								$countshinadb = "AND `kol_shtuk_diskov17x56x` LIKE '%".$countshina."%'";
-                   							}
-                   						}
-
-                   						$classificationdb = "";
-
-                   						if(isset($_GET['classification'])){
-                   							$classification = $_GET['classification'];
-                   							if($classification != 0){
-                   								$classificationdb = "AND `type_disk56x` LIKE '%".$classification."%'";
+                   						if(data.diamshina != ""){
+                   							var diamshina = formHelper.inputFilter(data.diamshina);
+                   							if(diamshina != "0"){
+                   								diamshinadb = "AND `diam_diska17x56x` LIKE '%" + diamshina + "%'";
                    							}
                    						}
 
 
+                   						var iznosshinadb = "";
+
+                   						if(data.iznosshina != ""){
+                   							var iznosshina = formHelper.inputFilter(data.iznosshina);
+                   							if(iznosshina != 0){
+                   								iznosshinadb = "AND `iznos_diska17x56x` LIKE '%" + iznosshina + "%'";
+                   							}
+                   						}
+
+                   						var countshinadb = "";
+
+                   						if(data.countshina != ""){
+                   							var countshina = formHelper.inputFilter(data.countshina);
+                   							if(countshina != 0){
+                   								countshinadb = "AND `kol_shtuk_diskov17x56x` LIKE '%" + countshina + "%'";
+                   							}
+                   						}
+
+                   						var classificationdb = "";
+
+                   						if(data.classification != ""){
+                   							var classification = formHelper.inputFilter(data.classification);
+                   							if(classification != 0){
+                   								classificationdb = "AND `type_disk56x` LIKE '%" + classification + "%'";
+                   							}
+                   						}
 
 
-
-                   				$sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%$cat2%' AND `category3` LIKE '%Диски%' $citydb $photodb $videodb $auxdb $protectordb $markadb $senadb $yearbuilddb $diamshinadb $iznosshinadb $countshinadb $classificationdb $deletedob ORDER BY priority DESC, `id` DESC LIMIT 40";
-
-
-
-
+                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Диски%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
 
                    				break;
 
                    				//diski
-
-
 
                    				case 'uslugitransport':
 
-                   						if($city != "0" && $country != "0"){
-                   								$citydb = "AND `city` LIKE '".$city."' AND `strana` LIKE '".$country."'";
-                   						}else{
-                   								$citydb = "";
-                   						}
+                   						var senadb = "";
+                   						if((data.senaotav != "") && (data.senadoav != "")){
 
+                   							var senaotav = data.senaotav;
+                   							var senadoav = data.senadoav;
 
+                   							if((senaotav >= "0") && (senadoav >= senaotav) && (senadoav > "0")){
 
-                   						$photodb = "";
-
-                   						if(isset($photo[0])){
-                   							if($photo[0] == "фото"){
-                   								$photodb = "AND `photo_path` != 'n.jpg'";
-                   							}
-                   						}
-
-                   						$videodb = "";
-
-                   						if(isset($video[0])){
-                   							if($video[0] == "video"){
-                   								$videodb = "AND `video` != 'нет'";
-                   							}
-                   						}
-
-                   						$auxdb = "";
-
-                   						if(isset($aux[0])){
-                   							if($aux[0] == "aux"){
-                   								$auxdb = "AND `vremya_nachala_auxion` != '0'";
-                   							}
-                   						}
-
-
-
-
-
-                   						$senadb = "";
-                   						if(isset($_GET['senaotav']) && isset($_GET['senadoav'])){
-
-                   							$senaotav = $_GET['senaotav'];
-                   							$senadoav = $_GET['senadoav'];
-                   							//$valyuta = $_GET['valyuta'];
-
-                   							if($senaotav >= "0" && $senadoav >= $senaotav && $senadoav > "0"){
-
-                   								$senadb = "AND `sena` >= '".$senaotav."' AND `sena` <= '".$senadoav."'";
+                   								senadb = "AND `sena` >= '" + senaotav + "' AND `sena` <= '" + senadoav + "'";
 
                    							}
                    						}
 
-                   						$category1db = "";
+                   						var category1db = "";
 
-                   						if(isset($_GET['category1'])){		//ispolzuetsya v medisine
-                   							$category1 = $_GET['category1'];
+                   						if(data.category1 != ""){		//ispolzuetsya v medisine
+                   							var category1 = data.category1;
 
-                   							$controlv = $_GET['category2'];
+                   							var controlv = data.category2;
 
-                   							if($category1 != "нет" && $controlv == "нет"){
-                   								$category1db = "WHERE `category1` LIKE '%".$category1."%'";
+                   							if((category1 != "нет") && (controlv == "нет")){
+                   								category1db = "WHERE `category1` LIKE '%" + category1 + "%'";
+                   							}
+
+                   						}
+
+
+                   						var category2db = "";
+
+                   						if(data.category2 != ""){
+                   							var category2 = data.category2;
+
+                   							if(category2 != "нет"){
+                   								category2db = "WHERE `category2` LIKE '%" + category2 + "%'";
                    							}
 
 
                    						}
 
+                   						var category3db = "";
 
-                   						$category2db = "";
+                   						if(data.category3 != ""){
+                   							var category3 = data.category3;
 
-                   						if(isset($_GET['category2'])){
-                   							$category2 = $_GET['category2'];
+                   							if(category3 != "нет"){
+                   								category3db = "AND `category3` LIKE '%" + category3 + "%'";
+                   							}
 
-                   							if($category2 != "нет"){
-                   								$category2db = "WHERE `category2` LIKE '%".$category2."%'";
+                   							if(category3 == "vacancy"){
+                   								category3db = "AND `category3` LIKE '%Вакансии%'";
                    							}
 
 
-                   						}
-
-                   						$category3db = "";
-
-                   						if(isset($_GET['category3'])){
-                   							$category3 = $_GET['category3'];
-
-                   							if($category3 != "нет"){
-                   								$category3db = "AND `category3` LIKE '%".$category3."%'";
-                   							}
-
-                   							if($category3 == "vacancy"){
-                   								$category3db = "AND `category3` LIKE '%Вакансии%'";
-                   							}
-
-
-                   							if($category3 == "zamena"){
-                   								$category4 = $_GET['category4'];
-                   								$category3db = "AND `category3` LIKE '%".$category4."%'";
+                   							if(category3 == "zamena"){
+                   								category4 = data.category4;
+                   								category3db = "AND `category3` LIKE '%" + category4 + "%'";
                    							}
 
 
                    						}
 
 
-
-
-                   				$sql = "SELECT * FROM `obinfo` $category2db $category1db $category3db $citydb $photodb $videodb $auxdb $senadb $deletedob ORDER BY priority DESC, `id` DESC LIMIT 40";
-
-
-
+                   				sql = "SELECT * FROM `obinfo` " + category2db + " " + category1db + " " + category3db + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + senadb + " " + deletedob + " " + finishsql;
 
 
                    				break;
 
                    				//diski
 
+                 			    default:
 
-                   			default:
-                   				# code...
                    				break;
                    		}
                    //x10
-                   				$countidfirst = 0;
+                   				var countidfirst = 0;
 
-                   				$query = $this->db->query($sql);
+                          console.log(sql);
 
-                   				$array = array();
-                   				$arraytwo = array();
+                          db_multiple.query(sql, function (error, results, fields) {
+                            if (error) throw error;
+                          // connected!
+                            //console.log(results);
 
-                   				foreach ($query->result() as $row)
-                   				{
-                   					if($row->photo_path != "n.jpg"){
+                            for(var i = 0;i < results.length;i++){
 
-                   						if(unserialize($row->photo_path) == true){
-                   							$array[] = unserialize($row->photo_path);
-                   						}else{
-                   							$array[] = "n.jpg";
-                   						}
+                              if(results[i].photo_path != "n.jpg"){
 
-                   					}else{
-                   						$array[] = "n.jpg";
-                   					}
+                                var unserial = PHPUnserialize.unserialize(results[i].photo_path);
 
-                   					if($row->video != "нет"){
+                     						if(unserial){
+                     							results[i].photo_path = unserial;
+                     						}
 
-                   					if(unserialize($row->video) == true){
-                   						$arraytwo[] = unserialize($row->video);
-                   						}else{
-                   							$arraytwo[] = "нет";
-                   						}
+                     					}
 
-                   					}else{
-                   						$arraytwo[] = "нет";
-                   					}
+                              if(results[i].video != "нет"){
 
-                   					$countidfirst = $row->id;
-                   				}
+                                  var unserialvideo = PHPUnserialize.unserialize(results[i].video);
+
+                         					if(unserialvideo){
+                       						     results[i].video = unserialvideo;
+                         						}
+
+                                }
+
+                                countidfirst = results[i].id;
+
+                            }
+
+                            //$checkset = $this->set_usersearch_logs($sql,$searchusersemail,$countidfirst,$search);
+                     				//xx
+
+                     				//$arr = array($query->result_array(),$array,$arraytwo,$countidfirst,$sql,$checkset);
+
+                            if(results){
+                              io.sockets.in(success_data.email).emit('searchData', {data: results,latestid:countidfirst,sql:sql});
+                            }
+
+                          });
+
+                   				// $array = array();
+                   				// $arraytwo = array();
+
+                   				// foreach ($query->result() as $row)
+                   				// {
+                   					// if($row->photo_path != "n.jpg"){
+                            //
+                   					// 	if(unserialize($row->photo_path) == true){
+                   					// 		$array[] = unserialize($row->photo_path);
+                   					// 	}else{
+                   					// 		$array[] = "n.jpg";
+                   					// 	}
+                            //
+                   					// }else{
+                   					// 	$array[] = "n.jpg";
+                   					// }
+
+                   					// if($row->video != "нет"){
+                            //
+                   					// if(unserialize($row->video) == true){
+                   					// 	$arraytwo[] = unserialize($row->video);
+                   					// 	}else{
+                   					// 		$arraytwo[] = "нет";
+                   					// 	}
+                            //
+                   					// }else{
+                   					// 	$arraytwo[] = "нет";
+                   					// }
+
+                   				// 	$countidfirst = $row->id;
+                   				// }
 
                    				//$searchusersemail
                    				//sql
                    				//$countidfirst
                    //search
-                   				$checkset = $this->set_usersearch_logs($sql,$searchusersemail,$countidfirst,$search);
+                   				//$checkset = $this->set_usersearch_logs($sql,$searchusersemail,$countidfirst,$search);
                    				//xx
 
-                   				$arr = array($query->result_array(),$array,$arraytwo,$countidfirst,$sql,$checkset);
-                   				//$arr = array($sql,$query->result_array());
+                   				//$arr = array($query->result_array(),$array,$arraytwo,$countidfirst,$sql,$checkset);
 
 
-
-
-
-
-
-
-
-                   io.sockets.in(data.email).emit('searchData', {msg: 'test_message'});
+                        //  io.sockets.to(data.email).emit('searchData', {msg: 'test_message'});
 
               });
 
