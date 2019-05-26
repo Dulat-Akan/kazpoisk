@@ -80,7 +80,7 @@ module.exports = function(io){
 
                      twopart_request = twopart_request.replace("40", pagesum);
 
-                     console.log(onepart_request + "|" + add_to_part_string + "|" + twopart_request);
+                     //console.log(onepart_request + "|" + add_to_part_string + "|" + twopart_request);
                      fullrequest = onepart_request + add_to_part_string + twopart_request;
 
                      db_multiple.query(fullrequest, function (error, results, fields) {
@@ -166,7 +166,7 @@ module.exports = function(io){
 
                   var searchstring = formHelper.cleanString(data.searchstring);
 
-                  console.log(searchstring);
+                  //console.log(searchstring);
 
                   var sql = "SELECT * FROM `obinfo` WHERE ((`zagolovok` LIKE '%" + searchstring + "%') OR (`opisanie` LIKE '%" + searchstring + "%')) AND (`status` != 'no') AND (`status` != 'deleted') ORDER BY priority DESC, `id` DESC LIMIT 40";
 

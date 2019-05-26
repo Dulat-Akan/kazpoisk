@@ -805,12 +805,9 @@ module.exports = function(io){
                    //x10
                    				var countidfirst = 0;
 
-                          console.log(sql);
-
                           db_multiple.query(sql, function (error, results, fields) {
                             if (error) throw error;
-                          // connected!
-                            //console.log(results);
+
 
                             for(var i = 0;i < results.length;i++){
 
@@ -838,60 +835,12 @@ module.exports = function(io){
 
                             }
 
-                            //$checkset = $this->set_usersearch_logs($sql,$searchusersemail,$countidfirst,$search);
-                     				//xx
-
-                     				//$arr = array($query->result_array(),$array,$arraytwo,$countidfirst,$sql,$checkset);
 
                             if(results){
                               io.sockets.in(success_data.email).emit('searchData', {data: results,latestid:countidfirst,sql:sql});
                             }
 
                           });
-
-                   				// $array = array();
-                   				// $arraytwo = array();
-
-                   				// foreach ($query->result() as $row)
-                   				// {
-                   					// if($row->photo_path != "n.jpg"){
-                            //
-                   					// 	if(unserialize($row->photo_path) == true){
-                   					// 		$array[] = unserialize($row->photo_path);
-                   					// 	}else{
-                   					// 		$array[] = "n.jpg";
-                   					// 	}
-                            //
-                   					// }else{
-                   					// 	$array[] = "n.jpg";
-                   					// }
-
-                   					// if($row->video != "нет"){
-                            //
-                   					// if(unserialize($row->video) == true){
-                   					// 	$arraytwo[] = unserialize($row->video);
-                   					// 	}else{
-                   					// 		$arraytwo[] = "нет";
-                   					// 	}
-                            //
-                   					// }else{
-                   					// 	$arraytwo[] = "нет";
-                   					// }
-
-                   				// 	$countidfirst = $row->id;
-                   				// }
-
-                   				//$searchusersemail
-                   				//sql
-                   				//$countidfirst
-                   //search
-                   				//$checkset = $this->set_usersearch_logs($sql,$searchusersemail,$countidfirst,$search);
-                   				//xx
-
-                   				//$arr = array($query->result_array(),$array,$arraytwo,$countidfirst,$sql,$checkset);
-
-
-                        //  io.sockets.to(data.email).emit('searchData', {msg: 'test_message'});
 
               });
 
