@@ -18,6 +18,8 @@ require('./controllers/upload_photo_video.js')(io);
 require('./controllers/load_homeStart.js')(io);
 require('./controllers/searchData.js')(io);
 require('./controllers/getCountData.js')(io);
+require('./controllers/getUserDetailData.js')(io);
+require('./controllers/userDetailService.js')(io);
 
 
 
