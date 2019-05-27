@@ -143,6 +143,59 @@ module.exports = function(io){
 
               });
 
+              socket.on('serviceMessages', function (data) {
+
+                  socket.join(data.email);
+
+                  var id = data.id;
+
+                  var action = data.action;
+                  var fromEmail = data.email;
+                  var toEmail = data.toEmail;
+
+                  if(action == "checkMessages"){
+
+                    db_multiple.query('SELECT * FROM `chat` WHERE ((`fromUser` = ?) AND (`toUser` = ?)) OR ((`fromUser` = ?) AND (`toUser` = ?))', [fromEmail,toEmail,toEmail,fromEmail], function (error, results, fields) {
+
+                      if(results.length > 0){
+
+                              io.sockets.in(data.email).emit('serviceMessages', {action:"checkMessages",data:results});
+
+                          }
+
+                        });
+
+                  }else if(action == "setMessages"){
+                    //email:myemail,toEmail:toEmail,toId:toId,text:text,avatar:avatar,name:name
+                    var name = data.name;
+                    var avatar = data.avatar;
+                    var text = data.text;
+                    var unixtime = new Date().getTime();
+
+                    var insert  = {
+                      name:name,
+                      fromUser:fromEmail,
+                      message:text,
+                      date:unixtime,
+                      image_url:avatar,
+                      toUser:toEmail
+                    };
+
+                    var query = db_multiple.query('INSERT INTO chat SET ?', insert, function (error, results, fields) {
+
+                      io.sockets.in(data.email).emit('serviceMessages', {action:"setMessages",status:"added",data:insert});
+                      io.sockets.in(toEmail).emit('serviceMessages', {action:"newMessages",data:insert});
+
+                    });
+
+                  }
+
+
+
+
+
+              });
+
 
 
         });
