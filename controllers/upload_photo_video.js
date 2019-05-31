@@ -1,6 +1,10 @@
 var db_multiple = require('../config/multiple_mysql.js');
 var SocketIOFile = require('socket.io-file');
 
+const imagemin = require('imagemin');
+const imageminJpegtran = require('imagemin-jpegtran');
+const imageminPngquant = require('imagemin-pngquant');
+
 var path = require('path');
 
 
@@ -49,6 +53,22 @@ module.exports = function(io){
                   if(fileInfo.mime.indexOf("image") >= 0){
                     var query = db_multiple.query('INSERT INTO temp_photo SET ?', insert, function (error, results, fields) {
                       if (error) throw error;
+
+                      //compress image
+                      // (async () => {
+                      //       const files = await imagemin(['images/*.{jpg,png}'], 'build/images', {
+                      //         plugins: [
+                      //           imageminJpegtran(),
+                      //           imageminPngquant({
+                      //             quality: [0.6, 0.8]
+                      //           })
+                      //         ]
+                      //       });
+                      //
+                      //       console.log(files);
+                      //  //     => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
+                      //       })();
+                      //compress image
 
                     });
                   }
