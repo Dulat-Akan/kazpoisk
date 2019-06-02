@@ -159,7 +159,11 @@ module.exports = function(io){
 
                       if(results.length > 0){
 
-                              io.sockets.in(data.email).emit('serviceMessages', {action:"checkMessages",data:results});
+                        db_multiple.query('UPDATE chat SET status = ? WHERE fromUser = ? AND toUser = ?', [1,toEmail,fromEmail], function (error, results, fields) {
+
+                        });
+
+                          io.sockets.in(data.email).emit('serviceMessages', {action:"checkMessages",data:results});
 
                           }
 

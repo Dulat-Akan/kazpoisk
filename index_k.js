@@ -21,6 +21,8 @@ require('./controllers/getCountData.js')(io);
 require('./controllers/getUserDetailData.js')(io);
 require('./controllers/userDetailService.js')(io);
 require('./controllers/getSubscribers.js')(io);
+require('./controllers/getContacts.js')(io);
+require('./controllers/getNotification.js')(io);
 
 
 
