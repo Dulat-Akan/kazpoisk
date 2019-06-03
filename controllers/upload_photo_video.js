@@ -4,9 +4,10 @@ var SocketIOFile = require('socket.io-file');
 const imagemin = require('imagemin');
 const imageminJpegtran = require('imagemin-jpegtran');
 const imageminPngquant = require('imagemin-pngquant');
+var ncp = require('ncp').ncp;
 
 var path = require('path');
-
+const fs = require('fs');
 
 module.exports = function(io){
 
@@ -16,7 +17,7 @@ module.exports = function(io){
 
               var uploader = new SocketIOFile(socket, {
                   uploadDir: {			// multiple directories
-                  	photo: '../../Sites/assets/entry/uploading_image',
+                  	photo: '../../Sites/assets/entry/compressed_image',
                   	video: '../../Sites/assets/entry/uploading_video'
                   },
                   //uploadDir: '../../Sites/assets/entry/uploading_image',							// simple directory
@@ -54,20 +55,59 @@ module.exports = function(io){
                     var query = db_multiple.query('INSERT INTO temp_photo SET ?', insert, function (error, results, fields) {
                       if (error) throw error;
 
+                      //step 1 compress image
                       //compress image
-                      // (async () => {
-                      //       const files = await imagemin(['images/*.{jpg,png}'], 'build/images', {
-                      //         plugins: [
-                      //           imageminJpegtran(),
-                      //           imageminPngquant({
-                      //             quality: [0.6, 0.8]
-                      //           })
-                      //         ]
-                      //       });
-                      //
-                      //       console.log(files);
-                      //  //     => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
-                      //       })();
+                      var input_path = '../../Sites/assets/entry/compressed_image/*.{jpg,png}';
+                      var output_path = '../../Sites/assets/entry/compressed_image';
+
+                      (async () => {
+                            const files = await imagemin([input_path], output_path, {
+                                plugins: [
+                                    imageminJpegtran(),
+                                    imageminPngquant({quality: '65-80'})
+                                ]
+                            });
+
+                            console.log(files);
+
+                            ncp.limit = 16;
+                            var finishpath = '../../Sites/assets/entry/uploading_image';
+
+                            setTimeout(function(){
+
+                              //step 2 copy to destination directory
+                              //copy images
+                              ncp(output_path, finishpath, function (err) {
+                               if (err) {
+                                 return console.error(err);
+                               }
+                               console.log('done!');
+                              });
+
+                              //copy images
+
+                              setTimeout(function(){
+
+                                //step3 delete from directory
+
+
+                                fs.readdir(output_path, (err, files) => {
+                                  if (err) throw err;
+
+                                  for (const file of files) {
+                                    fs.unlink(path.join(output_path, file), err => {
+                                      if (err) throw err;
+                                    });
+                                  }
+                                });
+                                //step3 delete from directory
+
+                              },200);
+
+                            },200);
+
+
+                        })();
                       //compress image
 
                     });
@@ -79,18 +119,6 @@ module.exports = function(io){
                     });
                   }
 
-
-
-                  // { name: '1555457966097.jpeg',
-                  //   size: 6890,
-                  //   wrote: 6890,
-                  //   uploadDir:
-                  //    '../../Sites/assets/entry/uploading_image/1555457966097.jpeg',
-                  //   data: {},
-                  //   mime: 'image/jpeg',
-                  //   estimated: 28,
-                  //   uploadId: 'u_0',
-                  //   originalFileName: 'download (2).jpeg' }
 
               });
               uploader.on('error', (err) => {
