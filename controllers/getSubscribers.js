@@ -277,7 +277,7 @@ module.exports = function(io){
 
                               db_multiple.query('SELECT * FROM `favorite` WHERE `email` = ?', [email], function (error, search, fields){
 
-                                  console.log(search);
+                                  //console.log(search);
                                   resolve(search);
 
                               });
@@ -314,7 +314,7 @@ module.exports = function(io){
                                   // before the string is actually processed by the mocked asynchronous code in the
                                   // previous then block.
                                   .then(function(result) {
-                                      console.log(result.length);
+                                      //console.log(result.length);
                                       io.sockets.in(data.email).emit('getFavorites', {data: result});
                                   });
 
