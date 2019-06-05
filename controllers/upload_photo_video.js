@@ -14,18 +14,17 @@ module.exports = function(io){
 
         io.on('connection', function(socket){
 
-              var productionphotoPath = '../../kazpoisk/assets/entry/compressed_image';
-              var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
+              //var productionphotoPath = '../../kazpoisk/assets/entry/compressed_image';
+              //var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
 
-              //var productionphotoPath = '../../Sites/assets/entry/compressed_image';
-              //var productionvideoPath = '../../Sites/assets/entry/uploading_video';
+              var productionphotoPath = '../../Sites/assets/entry/compressed_image';
+              var productionvideoPath = '../../Sites/assets/entry/uploading_video';
 
               var uploader = new SocketIOFile(socket, {
                   uploadDir: {			// multiple directories
                   	photo: productionphotoPath,
                   	video: productionvideoPath
                   },
-                  //uploadDir: '../../Sites/assets/entry/uploading_image',							// simple directory
                   accepts: ['image/jpeg','image/pjpeg','image/jpg','video/mpeg','video/mp4','video/msvideo','video/avi','application/x-troff-msvideo','video/x-msvideo'],		// chrome and some of browsers checking mp3 as 'audio/mp3', not 'audio/mpeg'
                   //maxFileSize: 4194304, 						// 4 MB. default is undefined(no limit)
                   maxFileSize: 200194304, 						// 4 MB. default is undefined(no limit)
@@ -62,11 +61,11 @@ module.exports = function(io){
 
                       //step 1 compress image
                       //compress image
-                      var productioninput_path = '../../kazpoisk/assets/entry/compressed_image/*.{jpg,png}';
-                      var productionoutput_path = '../../kazpoisk/assets/entry/compressed_image';
+                    //  var productioninput_path = '../../kazpoisk/assets/entry/compressed_image/*.{jpg,png}';
+                    //  var productionoutput_path = '../../kazpoisk/assets/entry/compressed_image';
 
-                      //var productioninput_path = '../../Sites/assets/entry/compressed_image/*.{jpg,png}';
-                      //var productionoutput_path = '../../Sites/assets/entry/compressed_image';
+                      var productioninput_path = '../../Sites/assets/entry/compressed_image/*.{jpg,png}';
+                      var productionoutput_path = '../../Sites/assets/entry/compressed_image';
 
                       (async () => {
                             const files = await imagemin([productioninput_path], productionoutput_path, {
@@ -85,9 +84,8 @@ module.exports = function(io){
 
                               //step 2 copy to destination directory
                               //copy images
-                              var productionfinishpath = '../../kazpoisk/assets/entry/uploads';
-                              //var productionfinishpath = '../../kazpoisk/assets/entry/uploading_image';
-                              //var productionfinishpath = '../../Sites/assets/entry/uploading_image';
+                              //var productionfinishpath = '../../kazpoisk/assets/entry/uploads';
+                              var productionfinishpath = '../../Sites/assets/entry/uploads';
 
                               ncp(productionoutput_path, productionfinishpath, function (err) {
                                if (err) {
