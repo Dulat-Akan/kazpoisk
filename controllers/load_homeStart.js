@@ -14,7 +14,7 @@ module.exports = function(io){
 
                    var latestid = 0;
                                                                 //gold                                                                  //premium                                                                                                                                               //random
-                   db_multiple.query("SELECT * FROM `obinfo` WHERE `priority` = '5' AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `priority` = '4'  AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `status` != 'no' AND `status` != 'deleted' ORDER BY priority DESC, `id` DESC LIMIT 40;", function (error, results, fields) {
+                   db_multiple.query("SELECT * FROM `obinfo` WHERE `priority` = '5' AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `priority` = '4'  AND `photo_path` != 'n.jpg' ORDER BY id desc LIMIT 40; SELECT * FROM `obinfo` WHERE `status` != 'no' AND `status` != 'deleted' ORDER BY priority DESC, `id` DESC LIMIT 15;", function (error, results, fields) {
                      if (error) throw error;
 
                      for(var i = 0;i < results.length;i++){
