@@ -1,6 +1,7 @@
 var db = require('../config/db.js');
 var db_multiple = require('../config/multiple_mysql.js');
 var timeconverter = require('../models/timeconverter.js');
+var Serialize = require('php-serialize')
 
 module.exports = function(io){
 
@@ -89,6 +90,54 @@ module.exports = function(io){
 
 
               });
+
+
+
+
+              socket.on('setUserContacts', function (data) {
+
+                   socket.join(data.email);
+
+                   var array = data.array;
+                   var email = data.email;
+
+                   if(data.action == "checkstatus"){
+
+                     db_multiple.query('SELECT `contactstatus` FROM `users` WHERE `email` = ? LIMIT 1', [email], function (error, results, fields) {
+
+                       var checkingstatus = 0;
+                       if(results.length > 0){
+                              checkingstatus = results[0].contactstatus;
+                           }
+
+                           if(checkingstatus == 0){
+                             io.sockets.in(data.email).emit('setUserContacts', {action: 'checkstatus',status:'0'});
+                           }else{
+                             io.sockets.in(data.email).emit('setUserContacts', {action: 'checkstatus',status:'1'});
+                           }
+
+
+                         });
+
+                   }else if(data.action == "setcontacts"){
+
+                        const serialized = Serialize.serialize(array);
+
+                     db_multiple.query('UPDATE users SET contacts = ?,contactstatus = ? WHERE email = ?', [serialized, 1, email], function (error, results, fields) {
+
+                        io.sockets.in(data.email).emit('setUserContacts', {action: 'setcontacts',status:'1'});
+
+                     });
+
+                   }
+
+
+
+
+
+              });
+
+
 
 
 

@@ -23,6 +23,7 @@ require('./controllers/userDetailService.js')(io);
 require('./controllers/getSubscribers.js')(io);
 require('./controllers/getContacts.js')(io);
 require('./controllers/getNotification.js')(io);
+require('./controllers/googleAuth.js')(io);
 
 
 
