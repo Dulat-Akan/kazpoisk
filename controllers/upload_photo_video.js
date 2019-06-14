@@ -1,11 +1,7 @@
 var db_multiple = require('../config/multiple_mysql.js');
 var SocketIOFile = require('socket.io-file');
 
-const imagemin = require('imagemin');
-const imageminJpegtran = require('imagemin-jpegtran');
-const imageminPngquant = require('imagemin-pngquant');
 var ncp = require('ncp').ncp;
-
 var path = require('path');
 const fs = require('fs');
 
@@ -15,10 +11,12 @@ module.exports = function(io){
         io.on('connection', function(socket){
 
               //var productionphotoPath = '../../kazpoisk/assets/entry/compressed_image';
-              //var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
 
-              var productionphotoPath = '../../Sites/assets/entry/compressed_image';
-              var productionvideoPath = '../../Sites/assets/entry/uploading_video';
+              var productionphotoPath = '../../kazpoisk/assets/entry/uploads';
+              var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
+
+              //var productionphotoPath = '../../Sites/assets/entry/compressed_image';
+              //var productionvideoPath = '../../Sites/assets/entry/uploading_video';
 
               var uploader = new SocketIOFile(socket, {
                   uploadDir: {			// multiple directories
@@ -58,66 +56,6 @@ module.exports = function(io){
                   if(fileInfo.mime.indexOf("image") >= 0){
                     var query = db_multiple.query('INSERT INTO temp_photo SET ?', insert, function (error, results, fields) {
                       if (error) throw error;
-
-                      //step 1 compress image
-                      //compress image
-                    //  var productioninput_path = '../../kazpoisk/assets/entry/compressed_image/*.{jpg,png}';
-                    //  var productionoutput_path = '../../kazpoisk/assets/entry/compressed_image';
-
-                      var productioninput_path = '../../Sites/assets/entry/compressed_image/*.{jpg,png}';
-                      var productionoutput_path = '../../Sites/assets/entry/compressed_image';
-
-                      (async () => {
-                            const files = await imagemin([productioninput_path], productionoutput_path, {
-                                plugins: [
-                                    imageminJpegtran(),
-                                    imageminPngquant({quality: '65-80'})
-                                ]
-                            });
-
-                            console.log(files);
-
-                            ncp.limit = 16;
-
-
-                            setTimeout(function(){
-
-                              //step 2 copy to destination directory
-                              //copy images
-                              //var productionfinishpath = '../../kazpoisk/assets/entry/uploads';
-                              var productionfinishpath = '../../Sites/assets/entry/uploads';
-
-                              ncp(productionoutput_path, productionfinishpath, function (err) {
-                               if (err) {
-                                 return console.error(err);
-                               }
-                               //console.log('done!');
-                              });
-
-                              //copy images
-
-                              setTimeout(function(){
-
-                                //step3 delete from directory
-
-                                fs.readdir(productionoutput_path, (err, files) => {
-                                  if (err) throw err;
-
-                                  for (const file of files) {
-                                    fs.unlink(path.join(productionoutput_path, file), err => {
-                                      if (err) throw err;
-                                    });
-                                  }
-                                });
-                                //step3 delete from directory
-
-                              },1000);
-
-                            },1000);
-
-
-                        })();
-                      //compress image
 
                     });
                   }
