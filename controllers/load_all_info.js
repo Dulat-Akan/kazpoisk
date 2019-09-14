@@ -48,20 +48,22 @@ module.exports = function(io){
                 db.query('SELECT * FROM `appparams` ',
                     function(err, results, fields) {
 
+                      if(results){
+                        empty_pod_text = results[0].empty_pod_text;
+                        automatic_publication_status = results[0].automatic_publication_status_text;
+                        temp_status_text = results[0].temp_status_text;
 
-                      empty_pod_text = results[0].empty_pod_text;
-                      automatic_publication_status = results[0].automatic_publication_status_text;
-                      temp_status_text = results[0].temp_status_text;
-
-                      empty_ob_price = results[0].ob_empty_price;
-                      gold_price = results[0].gold_tarif;
-                      premium_price = results[0].primium_tarif;
-                      classic_price = results[0].classic_tarif;
-                      quick_price = results[0].quick_tarif;
-                      easy_price = results[0].quick_tarif;
+                        empty_ob_price = results[0].ob_empty_price;
+                        gold_price = results[0].gold_tarif;
+                        premium_price = results[0].primium_tarif;
+                        classic_price = results[0].classic_tarif;
+                        quick_price = results[0].quick_tarif;
+                        easy_price = results[0].quick_tarif;
 
 
-                      io.sockets.in(device).emit('load_all_info_action', {empty_ob_price:empty_ob_price,gold_price:gold_price,premium_price:premium_price,classic_price:classic_price,quick_price:quick_price,easy_price:easy_price,empty_pod_text:empty_pod_text,automatic_publication_status:automatic_publication_status,temp_status_text:temp_status_text,currency_ru:currency_ru});
+                        io.sockets.in(device).emit('load_all_info_action', {empty_ob_price:empty_ob_price,gold_price:gold_price,premium_price:premium_price,classic_price:classic_price,quick_price:quick_price,easy_price:easy_price,empty_pod_text:empty_pod_text,automatic_publication_status:automatic_publication_status,temp_status_text:temp_status_text,currency_ru:currency_ru});
+
+                      }
 
                     }
                 );

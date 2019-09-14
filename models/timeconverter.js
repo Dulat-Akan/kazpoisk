@@ -116,6 +116,13 @@ module.exports = {
 
       return time;
 
+    },
+    getUnixtime:function(){
+
+      var unixtime = moment().unix();
+
+      return unixtime;
+
     }
 
 

@@ -12,11 +12,11 @@ module.exports = function(io){
 
               //var productionphotoPath = '../../kazpoisk/assets/entry/compressed_image';
 
-              var productionphotoPath = '../../kazpoisk/assets/entry/uploads';
-              var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
+              //var productionphotoPath = '../../kazpoisk/assets/entry/uploads';
+              //var productionvideoPath = '../../kazpoisk/assets/entry/uploading_video';
 
-              //var productionphotoPath = '../../Sites/assets/entry/compressed_image';
-              //var productionvideoPath = '../../Sites/assets/entry/uploading_video';
+              var productionphotoPath = '../../Sites/assets/entry/uploads';
+              var productionvideoPath = '../../Sites/assets/entry/uploading_video';
 
               var uploader = new SocketIOFile(socket, {
                   uploadDir: {			// multiple directories

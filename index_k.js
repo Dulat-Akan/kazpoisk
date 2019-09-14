@@ -24,6 +24,7 @@ require('./controllers/getSubscribers.js')(io);
 require('./controllers/getContacts.js')(io);
 require('./controllers/getNotification.js')(io);
 require('./controllers/googleAuth.js')(io);
+require('./controllers/sendData.js')(io);
 
 
 
@@ -83,10 +84,7 @@ io.on('connection', function(socket){
 						}
 				);
 
-
 				//io.emit('obinfo', msg);
-
-
 
 		});
 
@@ -113,13 +111,13 @@ var time_message_obj = {
 
 function setMessage_email(){
 
-	request.get({url:'http://kazpoisk.kz/public_control/searchusersneirointellect'}, function(err,httpResponse,body){
+	request.get({url:'https://kazpoisk.kz/public_control/searchusersneirointellect'}, function(err,httpResponse,body){
 
-					console.log(body);
+					//console.log(body);
 
 				 })
 
-	console.log("send_message");
+	//console.log("send_message");
 
 
 }
@@ -140,16 +138,24 @@ function setMessage_email(){
 // 	 (time_message_obj['seconds'] == seconds)){
 // 		setMessage_email();
 // 	}
-
-	// if((time_message_obj2["time"] == hour) && (time_message_obj2['minutes'] == minutes) &&
-	//  (time_message_obj2['seconds'] == seconds)){
-	// 	setMessage_email();
-	// }
-
-	//console.log(hour + " : " + minutes + " : " + seconds);
-
-
+//
+// 	if((time_message_obj2["time"] == hour) && (time_message_obj2['minutes'] == minutes) &&
+// 	 (time_message_obj2['seconds'] == seconds)){
+// 		setMessage_email();
+// 	}
+//
+// 	console.log(hour + " : " + minutes + " : " + seconds);
+//
+//
 // },1000);
+
+// setInterval(function(){
+//
+//
+// 	setMessage_email();
+//
+//
+// },120000);
 
 
 //Чтобы отправить событие всем, Socket.IO дает нам io.emit:

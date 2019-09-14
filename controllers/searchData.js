@@ -28,6 +28,11 @@ module.exports = function(io){
                    var photo = false;
                    var srochno = false;
                    var video = false;
+                   var f_lat = data.lat;
+                   var f_long = data.lng;
+                   var distance = 15;
+                   var trycount = 0;
+                   var minsearchPoint = 1;
 
                       if(data.aux){
                         aux = formHelper.checkCheckbox(data.aux);
@@ -87,7 +92,7 @@ module.exports = function(io){
                           citydb = "AND `city` LIKE '" + city + "' AND `strana` LIKE '" + country + "'";
                       }
 
-
+                      var startsql = "SELECT *, ( 6371 * acos( cos( radians('" + f_lat +  "') ) * cos( radians( Latitude ) ) * cos( radians( Longitude ) - radians('"  + f_long +  "') ) + sin( radians('" + f_lat + "') ) * sin( radians( Latitude ) ) ) ) AS distance FROM obinfo HAVING distance < " + distance + " AND ";
                       var finishsql = "ORDER BY priority DESC, `id` DESC LIMIT 40";
 
                   var searchusersemail = formHelper.inputFilter(data.useremailsearch);
@@ -107,6 +112,8 @@ module.exports = function(io){
                  				 var ploshad_ot = formHelper.inputFilter(data.ploshadotkv);
                  				 var sena_do = formHelper.inputFilter(data.senadokv);
                  				 var sena_ot = formHelper.inputFilter(data.senaotkv);
+
+
 
 
                    				if(kv == "купить"){
@@ -166,7 +173,8 @@ module.exports = function(io){
 
                    				var category3db = "AND `category3` = '" + category3 + "'";
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + kv + "%' " + category3db + " " + komnatdb + " " + senadb + " " + etazhdb + " " + ploshaddb + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + deletedob + " " + finishsql;
+                   				//sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + kv + "%' " + category3db + " " + komnatdb + " " + senadb + " " + etazhdb + " " + ploshaddb + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + kv + "%' " + category3db + " " + komnatdb + " " + senadb + " " + etazhdb + " " + ploshaddb + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + deletedob + " " + finishsql;
 
 
                    				break;
@@ -266,7 +274,7 @@ module.exports = function(io){
 
                    						}
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + srochnodb + " " + korobkadb + " " + markadb + " " + senadb + " " + yeardb + " " + svetavtodb + " " + toplivodb + " " + category3db + " " + ruldb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + srochnodb + " " + korobkadb + " " + markadb + " " + senadb + " " + yeardb + " " + svetavtodb + " " + toplivodb + " " + category3db + " " + ruldb + " " + deletedob + " " + finishsql;
 
                    				break;
 
@@ -364,7 +372,7 @@ module.exports = function(io){
                    						}
 
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + srochnodb + " " + korobkadb + " " + markadb + " " + senadb + " " + yeardb + " " + svetavtodb + " " + toplivodb + " " + category3db + " " + ruldb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + srochnodb + " " + korobkadb + " " + markadb + " " + senadb + " " + yeardb + " " + svetavtodb + " " + toplivodb + " " + category3db + " " + ruldb + " " + deletedob + " " + finishsql;
 
                    				break;
 
@@ -438,7 +446,7 @@ module.exports = function(io){
 
 
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + " AND `marka_zapch_spes68x` = 'нет' " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + " AND `marka_zapch_spes68x` = 'нет' " + deletedob + " " + finishsql;
 
 
 
@@ -507,7 +515,7 @@ module.exports = function(io){
 
 
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + "AND `marka_legk67x` = 'нет' " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + sostoyaniedb + " " + markadb + " " + senadb + " " + whereisdb + " " + "AND `marka_legk67x` = 'нет' " + deletedob + " " + finishsql;
 
 
 
@@ -616,7 +624,7 @@ module.exports = function(io){
                    						}
 
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Шины%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Шины%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
 
 
                    				break;
@@ -721,7 +729,7 @@ module.exports = function(io){
                    						}
 
 
-                   				sql = "SELECT * FROM `obinfo` WHERE `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Диски%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + " `category2` LIKE '%" + cat2 + "%' AND `category3` LIKE '%Диски%' " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + protectordb + " " + markadb + " " + senadb + " " + yearbuilddb + " " + diamshinadb + " " + iznosshinadb + " " + countshinadb + " " + classificationdb + " " + deletedob + " " + finishsql;
 
                    				break;
 
@@ -762,7 +770,7 @@ module.exports = function(io){
                    							var category2 = data.category2;
 
                    							if(category2 != "нет"){
-                   								category2db = "WHERE `category2` LIKE '%" + category2 + "%'";
+                   								category2db = " `category2` LIKE '%" + category2 + "%'";
                    							}
 
 
@@ -791,7 +799,7 @@ module.exports = function(io){
                    						}
 
 
-                   				sql = "SELECT * FROM `obinfo` " + category2db + " " + category1db + " " + category3db + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + senadb + " " + deletedob + " " + finishsql;
+                   				sql = startsql + category2db + " " + category1db + " " + category3db + " " + citydb + " " + photodb + " " + videodb + " " + auxdb + " " + senadb + " " + deletedob + " " + finishsql;
 
 
                    				break;
@@ -805,42 +813,59 @@ module.exports = function(io){
                    //x10
                    				var countidfirst = 0;
 
-                          db_multiple.query(sql, function (error, results, fields) {
-                            if (error) throw error;
+                          function searchNearMe(){
+                                db_multiple.query(sql, function (error, results, fields) {
+                                  if (error) throw error;
+
+                                  if(results.length < minsearchPoint){
+
+                                      if(trycount > 20){
+                                        return false;
+                                      }
+                                      distance += 500;
+                                      //console.log(distance);
+                                      searchNearMe();
+                                      trycount++;
+                                      return false;
+                                  }
+
+                                  for(var i = 0;i < results.length;i++){
+
+                                    if(results[i].photo_path != "n.jpg"){
+
+                                      var unserial = PHPUnserialize.unserialize(results[i].photo_path);
+
+                           						if(unserial){
+                           							results[i].photo_path = unserial;
+                           						}
+
+                           					}
+
+                                    if(results[i].video != "нет"){
+
+                                        var unserialvideo = PHPUnserialize.unserialize(results[i].video);
+
+                               					if(unserialvideo){
+                             						     results[i].video = unserialvideo;
+                               						}
+
+                                      }
+
+                                      countidfirst = results[i].id;
+
+                                  }
 
 
-                            for(var i = 0;i < results.length;i++){
+                                  if(results){
+                                    io.sockets.in(success_data.email).emit('searchData', {data: results,latestid:countidfirst,sql:sql});
+                                  }
 
-                              if(results[i].photo_path != "n.jpg"){
+                                });
+                          }
 
-                                var unserial = PHPUnserialize.unserialize(results[i].photo_path);
-
-                     						if(unserial){
-                     							results[i].photo_path = unserial;
-                     						}
-
-                     					}
-
-                              if(results[i].video != "нет"){
-
-                                  var unserialvideo = PHPUnserialize.unserialize(results[i].video);
-
-                         					if(unserialvideo){
-                       						     results[i].video = unserialvideo;
-                         						}
-
-                                }
-
-                                countidfirst = results[i].id;
-
-                            }
+                          searchNearMe();
 
 
-                            if(results){
-                              io.sockets.in(success_data.email).emit('searchData', {data: results,latestid:countidfirst,sql:sql});
-                            }
-
-                          });
 
               });
 
