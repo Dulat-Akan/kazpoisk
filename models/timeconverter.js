@@ -60,6 +60,12 @@ module.exports = {
 
    },
 
+    timeConverter_us_date_time:function(UNIX_timestamp){
+
+     return moment.unix(UNIX_timestamp / 1000).format("MM/DD/YYYY hh:mm");
+
+   },
+
 
     getDateStart:function(){
 
@@ -122,6 +128,14 @@ module.exports = {
       var unixtime = moment().unix();
 
       return unixtime;
+
+    },
+
+    getCurrentDate:function(){
+
+      var d = new Date();
+
+      return d.getDate();
 
     }
 

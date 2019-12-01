@@ -1,6 +1,14 @@
 var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const fs = require('fs');
+// var http = require('http').Server(app);
+
+
+var https = require('https').Server({
+  key: fs.readFileSync('certificates/privatekey.pem'),
+  cert: fs.readFileSync('certificates/certificate.pem')
+},app);
+
+var io = require('socket.io')(https);
 var request = require('request');
 
 
@@ -25,6 +33,7 @@ require('./controllers/getContacts.js')(io);
 require('./controllers/getNotification.js')(io);
 require('./controllers/googleAuth.js')(io);
 require('./controllers/sendData.js')(io);
+require('./controllers/notification.js')(io);
 
 
 
@@ -175,6 +184,7 @@ function setMessage_email(){
 
 
 
-http.listen(3001, function(){
+
+https.listen(3001, function(){
   console.log('listening on *:3001');
 });

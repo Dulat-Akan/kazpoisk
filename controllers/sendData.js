@@ -2,6 +2,7 @@ var db = require('../config/db.js');
 var db_multiple = require('../config/multiple_mysql.js');
 var Serialize = require('php-serialize');
 var timeConverter = require('../models/timeconverter.js');
+var notificationBox = require("../models/notificationBox.js");
 
 module.exports = function(io){
 
@@ -294,6 +295,9 @@ module.exports = function(io){
                       insert.date = timeConverter.getUnixtime();
                       insert.date_finish_prodlenie = timeConverter.getUnixtime() + (3600 * 24 * 7);
 
+                      //send notification
+                      notificationBox.sendFollowedUserSingleHyper(insert.zagolovok,insert.opisanie,insert.opisanie,insert.email);
+                      //send notification
 
                       var query = db_multiple.query('INSERT INTO obinfo SET ?', insert, function (error, results, fields) {
 
@@ -355,6 +359,7 @@ module.exports = function(io){
 
                             //console.log(error);
 
+
                             io.sockets.in(data.email).emit('sendData', {status:"ok"});
 
 
@@ -365,17 +370,7 @@ module.exports = function(io){
                   });
 
 
-
-
-
-                   // var query = multiple_db.query('INSERT INTO users_data SET ?', insert, function (error, results, fields) {
-                   //   if (error) throw error;
-                   //
-                   //   check_insert = 1;
-                   //
-                   // });
-
-                  // io.sockets.in(data.email).emit('sendData', {status: 'ok'});
+                    //finish socket bracket
 
               });
 

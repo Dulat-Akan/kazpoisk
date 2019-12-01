@@ -30,7 +30,7 @@ module.exports = function(io){
                    var video = false;
                    var f_lat = data.lat;
                    var f_long = data.lng;
-                   var distance = 15;
+                   var distance = 100;
                    var trycount = 0;
                    var minsearchPoint = 1;
 
@@ -822,7 +822,7 @@ module.exports = function(io){
                                       if(trycount > 20){
                                         return false;
                                       }
-                                      distance += 500;
+                                      distance += 1000;
                                       //console.log(distance);
                                       searchNearMe();
                                       trycount++;
